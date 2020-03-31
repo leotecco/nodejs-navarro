@@ -18,7 +18,7 @@ router.post("/", function(req,res){
     });
 
     router.get("/", function(req, res){
-        Venda.find(function(err, vend){
+        Venda.find().populate('produtos').exec(function(err, vend){
             if(err)
                 res.send(err);
             
