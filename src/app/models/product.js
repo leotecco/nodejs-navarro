@@ -7,4 +7,4 @@ var productSchema = new Schema({
     descricao: String
 });
 
-module.exports = mongoose.model('Produto', productSchema);
+module.exports = mongoose.model('Product', productSchema);
