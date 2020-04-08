@@ -1,83 +1,77 @@
-const Product = require("./../models/product");
+const productRepository = require("./../repositories/product-repository");
 
-exports.post = function(req, res) {
-  const product = new Product();
-  product.nome = req.body.nome;
-  product.preco = req.body.preco;
-  product.descricao = req.body.descricao;
+exports.post = async (req, res) => {
+  try {
+    const product = await productRepository.post(req.body);
 
-  product.save(function(error) {
-    if (error) res.send("Erro ao salvar produto" + error);
-
-    res.status(201).json({ message: "Produto inserido com sucesso" });
-  });
+    res.status(201).json({ message: "Produto inserido com sucesso", product });
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao salvar produto!", error });
+  }
 };
 
-exports.getAll = function(req, res) {
-  Product.find(function(err, products) {
-    if (err) res.send(err);
+exports.getAll = async (req, res) => {
+  try {
+    const products = await productRepository.get();
+
+    res
+      .status(200)
+      .json({ message: "Produtos listados com sucesso", products });
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao listar produtos!", error });
+  }
+};
+
+exports.get = async (req, res) => {
+  try {
+    const product = await productRepository.getById(req.params.productId);
+
+    if (product) {
+      res.status(200).json({
+        message: "Produtos encontrado com sucesso",
+        product,
+      });
+
+      return;
+    }
+
+    res.status(404).json({
+      message: "Produto não encontrado!",
+    });
+  } catch (error) {
+    res.send({ message: "Erro ao consultar produto!", error });
+  }
+};
+
+exports.put = async (req, res) => {
+  try {
+    const product = await productRepository.put(req.params.productId, req.body);
+
+    if (product) {
+      res.status(200).json({
+        message: "Produtos atualizado com sucesso",
+        product,
+      });
+
+      return;
+    }
+
+    res.status(404).json({
+      message: "Produto não encontrado!",
+    });
+  } catch (error) {
+    res.send({ message: "Erro ao atualizar produto!", error });
+  }
+};
+
+exports.delete = async (req, res) => {
+  try {
+    await productRepository.delete(req.params.productId);
 
     res.status(200).json({
-      message: "Produtos retornados",
-      products
+      message: "Produto excluído com sucesso",
     });
-  });
-};
-
-exports.get = function(req, res) {
-  const id = req.params.productId;
-
-  Product.findById(id, function(err, product) {
-    if (err) {
-      res.send(err);
-    } else if (product === null) {
-      res.status(400).json({
-        message: "Produto não encontrado"
-      });
-    } else {
-      res.status(200).json({
-        message: "Produtos retornados",
-        product
-      });
-    }
-  });
-};
-
-exports.put = function(req, res) {
-  const id = req.params.productId;
-
-  Product.findById(id, function(err, product) {
-    if (err) {
-      res.send(err);
-    } else if (product === null) {
-      res.status(400).json({
-        message: "Produto não encontrado"
-      });
-    } else {
-      product.nome = req.body.nome;
-      product.preco = req.body.preco;
-      product.descricao = req.body.descricao;
-
-      product.save(function(error) {
-        if (error) res.send("Erro ao tentar atualizar um produto" + error);
-
-        res
-          .status(201)
-          .json({ message: "Produto atualizado com sucesso", product });
-      });
-    }
-  });
-};
-
-exports.delete = function(req, res) {
-  const id = req.params.productId;
-
-  Product.findByIdAndRemove(id, function(err) {
-    if (err)
-      return res
-        .status(500)
-        .send("Erro ao tentar atualizar um produto" + error);
-
-    res.status(201).json({ message: "Produto removido com sucesso" });
-  });
+  } catch (error) {
+    res.send({ message: "Erro ao excluir produto!", error });
+  }
 };
