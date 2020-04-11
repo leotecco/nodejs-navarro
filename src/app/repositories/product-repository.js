@@ -1,9 +1,17 @@
 const Product = require("./../models/product");
+const logger = require("./../logger");
 
-exports.post = (data) => {
+exports.post = async (data) => {
   const product = new Product(data);
 
-  return product.save();
+  await product.save();
+
+  await logger.product.create({
+    message: `Dados gravados com sucesso.
+DATA ${JSON.stringify(data)} - PRODUCT: ${JSON.stringify(product)}`,
+  });
+
+  return product;
 };
 
 exports.get = () => {

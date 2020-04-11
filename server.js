@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const mongoose = require("mongoose");
+const logger = require("./src/app/logger");
 
 const PORT = process.env.port || 3000;
 
@@ -15,9 +16,11 @@ mongoose.connect(
   "mongodb+srv://leotecco:leotecco@cluster0-8hzev.mongodb.net/test?retryWrites=true&w=majority",
   {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
   }
 );
+
+logger.init();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
