@@ -1,4 +1,5 @@
 const userRepository = require("./../repositories/user-repository");
+const authRepository = require("./../repositories/auth-repository");
 
 exports.post = async (req, res) => {
   try {
@@ -42,5 +43,35 @@ exports.get = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Erro ao listar usuários!", error });
+  }
+};
+
+exports.userRegister = async (req, res) => {
+  try {
+    const user = await authRepository.userRegister(req.body);
+
+    if (user) {
+      res.status(201).json({ message: "Cadastrado com sucesso!", user });
+    }
+
+    res.status(400).json({ message: "Usuário já cadastrado!" });
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao cadastrar!", error });
+  }
+};
+
+exports.userLogin = async (req, res) => {
+  try {
+    const user = await authRepository.userLogin(req.body);
+
+    if (user) {
+      return res
+        .status(201)
+        .json({ message: "Login realizado com sucesso!", user });
+    }
+
+    return res.status(401).json({ message: "Email e/ou senha inválidos!" });
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao realizar login!", error });
   }
 };
