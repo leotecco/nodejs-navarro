@@ -1,6 +1,7 @@
+const jwt = require("jsonwebtoken");
 const User = require("./../models/user");
 
-exports.userRegister = async (data) => {
+exports.register = async (data) => {
   const hasUser = await User.findOne({ email: data.email });
 
   if (hasUser) {
@@ -14,12 +15,15 @@ exports.userRegister = async (data) => {
   await user.save();
 
   return {
-    email: user.email,
-    signUpDate: user.signUpDate,
+    user: {
+      id: user.id,
+      email: user.email,
+      signUpDate: user.signUpDate,
+    },
   };
 };
 
-exports.userLogin = async (data) => {
+exports.login = async (data) => {
   const user = await User.findOne({ email: data.email });
 
   if (!user) {
@@ -30,5 +34,15 @@ exports.userLogin = async (data) => {
     return null;
   }
 
-  return user;
+
+  console.log(process.env.SECRET);
+  
+  return {
+    user: {
+      id: user.id,
+      email: user.email,
+      signUpDate: user.signUpDate,
+    },
+    token: jwt.sign({ id: user.id }, process.env.SECRET, { expiresIn: 120 }),
+  };
 };
